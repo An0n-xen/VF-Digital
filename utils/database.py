@@ -119,3 +119,33 @@ class VideoDatabase:
     def _save_metadata(self):
         with open(self.meta_path, "w") as f:
             json.dump(self.metadata, f, indent=4)
+
+
+if __name__ == "__main__":
+    db = VideoDatabase()
+
+    # 1. Add Videos (Do this once)
+    logger.info("Adding videos to database")
+    db.add_video("movies/matrix.mp4", "The Matrix")
+    db.add_video("movies/shrek.mp4", "Shrek")
+
+    # 2. Search (Simulated)
+    logger.info("Searching for videos")
+    if len(db.metadata) > 0:
+        # Pick the first file in DB to test
+        test_id = list(db.metadata.keys())[0]
+        test_path = os.path.join(db.fp_folder, f"{test_id}.npy")
+
+        # Load it and cut a 10s clip (Frames 50-150)
+        full_fps = np.load(test_path)
+        query_clip = full_fps[50:150]
+
+        logger.info("Running test search")
+        result = db.search(query_clip)
+
+        if result:
+            logger.info(f">> MATCH FOUND: {result['video']}")
+            logger.info(f">> Timestamp: {result['start_time']} seconds")
+            logger.info(f">> Confidence Score: {result['score']:.5f}")
+        else:
+            logger.info("No match found.")

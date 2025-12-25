@@ -2,6 +2,7 @@ import os
 import logging
 import colorlog
 
+
 def setup_logger(name=None, level=logging.INFO):
     """
     Set up logger with file and line number information.
@@ -24,7 +25,7 @@ def setup_logger(name=None, level=logging.INFO):
     console_handler = logging.StreamHandler()
     console_handler.setLevel(level)
 
-   # Colored formatter
+    # Colored formatter
     console_formatter = colorlog.ColoredFormatter(
         fmt="%(log_color)s%(asctime)s | %(filename)s:%(lineno)d | %(levelname)s | %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
