@@ -1,6 +1,9 @@
 from flask import Flask, render_template, request, jsonify, send_from_directory
 import os
 import logging
+import time
+import threading
+from datetime import datetime
 from werkzeug.utils import secure_filename
 import numpy as np
 from utils.database import VideoDatabase
@@ -24,6 +27,68 @@ logger.info("INITIALIZING FLASK APPLICATION")
 logger.info("=" * 80)
 db = VideoDatabase()
 logger.info(f"Video database initialized with {len(db.metadata)} videos")
+
+
+def cleanup_old_videos():
+    """
+    Background task that deletes uploaded videos every 15 minutes to save disk space.
+    Fingerprints are preserved in the database.
+    """
+    while True:
+        try:
+            time.sleep(15 * 60)  # Wait 15 minutes
+
+            upload_folder = app.config["UPLOAD_FOLDER"]
+            if not os.path.exists(upload_folder):
+                continue
+
+            logger.info("=" * 80)
+            logger.info("CLEANUP: Starting automatic video cleanup")
+            logger.info("=" * 80)
+
+            deleted_count = 0
+            total_size = 0
+
+            # Get all files in upload folder
+            for filename in os.listdir(upload_folder):
+                filepath = os.path.join(upload_folder, filename)
+
+                # Skip directories and query files
+                if os.path.isdir(filepath) or filename.startswith("query_"):
+                    continue
+
+                try:
+                    # Get file size before deletion
+                    file_size = os.path.getsize(filepath)
+                    total_size += file_size
+
+                    # Delete the file
+                    os.remove(filepath)
+                    deleted_count += 1
+                    logger.info(
+                        f"CLEANUP: Deleted {filename} ({file_size / (1024*1024):.2f} MB)"
+                    )
+
+                except Exception as e:
+                    logger.error(f"CLEANUP: Error deleting {filename}: {str(e)}")
+
+            if deleted_count > 0:
+                logger.info(
+                    f"CLEANUP: Deleted {deleted_count} video(s), freed {total_size / (1024*1024):.2f} MB"
+                )
+            else:
+                logger.info("CLEANUP: No videos to delete")
+
+            logger.info("=" * 80)
+
+        except Exception as e:
+            logger.error(f"CLEANUP: Error in cleanup thread: {str(e)}")
+
+
+# Start cleanup thread
+cleanup_thread = threading.Thread(target=cleanup_old_videos, daemon=True)
+cleanup_thread.start()
+logger.info("CLEANUP: Background cleanup thread started (runs every 15 minutes)")
 
 
 def allowed_file(filename):

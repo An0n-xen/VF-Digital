@@ -6,9 +6,10 @@ A powerful video fingerprinting and recognition system with a modern web interfa
 
 - **Video Fingerprinting**: Upload videos to create unique fingerprints stored in a searchable database
 - **Content Matching**: Search for video clips and find matches with timestamp accuracy
-- **Modern Web UI**: Beautiful dark-mode interface with real-time feedback
+- **Modern Web UI**: Beautiful dark-mode interface with real-time feedback and stage tracking
 - **Comprehensive Logging**: Stage-by-stage logging for every operation
-- **Real-time Progress**: Live updates during video processing and searching
+- **Real-time Progress**: Live updates during video processing and searching with visual indicators
+- **Automatic Cleanup**: Uploaded videos are automatically deleted every 15 minutes to save disk space (fingerprints are preserved)
 
 ## 🚀 Quick Start
 
@@ -17,6 +18,8 @@ A powerful video fingerprinting and recognition system with a modern web interfa
 1. Install dependencies:
 ```bash
 pip install -r requirements.txt
+# or if using uv/poetry
+uv sync
 ```
 
 2. Run the Flask application:
@@ -51,11 +54,18 @@ http://127.0.0.1:5000
 
 The web interface includes:
 
+- **Centered Card Design**: Sonic Identify-inspired layout with cyan/purple gradients
+- **Tab Navigation**: Switch between "ADD VIDEO" and "FIND VIDEO"
 - **Database Status Dashboard**: View all videos in your database
-- **Upload Section**: Add new videos with drag-and-drop
+- **Upload Section**: Add new videos with drag-and-drop support
 - **Search Section**: Upload query clips to find matches
-- **Activity Logs**: Real-time logging of all operations
+- **Real-time Stage Tracker**: Visual indicators showing all 4 processing stages:
+  1. File Validation
+  2. Video Preprocessing
+  3. Fingerprint Extraction
+  4. Database Operation
 - **Results Display**: Beautiful cards showing match results
+- **Automatic Cleanup Logs**: Monitor space-saving operations
 
 ## 📊 API Endpoints
 
@@ -81,6 +91,17 @@ Edit `app.py` to customize:
 - `ALLOWED_EXTENSIONS`: Supported video formats
 - `UPLOAD_FOLDER`: Directory for uploaded files
 
+### Automatic Cleanup
+
+The system automatically deletes uploaded videos every **15 minutes** to save disk space. This cleanup:
+- ✅ Runs in a background thread
+- ✅ Preserves all fingerprints in the database
+- ✅ Keeps the database fully functional
+- ✅ Logs all cleanup operations
+- ⚠️ Only deletes original video files, not fingerprints
+
+**Note**: Videos are deleted from `./data/uploads/` but their fingerprints remain in `./data/video_db/fingerprints/` for searching.
+
 ## 📁 Project Structure
 
 ```
@@ -91,17 +112,18 @@ VF-Digital/
 ├── templates/
 │   └── index.html           # Web UI template
 ├── static/
-│   ├── style.css            # UI styling
+│   ├── style.css            # Sonic Identify styling
 │   └── script.js            # Client-side logic
 ├── utils/
 │   ├── database.py          # Database operations
 │   ├── video_utils.py       # Video processing
 │   ├── visualize.py         # Visualization tools
 │   └── logger_config.py     # Logging configuration
-├── uploads/                 # Uploaded video files
-└── video_db/                # Fingerprint database
-    ├── fingerprints/        # Fingerprint .npy files
-    └── metadata.json        # Video metadata
+└── data/
+    ├── uploads/             # Temporary uploaded videos (auto-deleted every 15min)
+    └── video_db/            # Fingerprint database (permanent)
+        ├── fingerprints/    # Fingerprint .npy files
+        └── metadata.json    # Video metadata
 ```
 
 ## 🎯 Use Cases
