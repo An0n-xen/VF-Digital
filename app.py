@@ -14,7 +14,7 @@ from utils.logger_config import setup_logger
 logger = setup_logger(__name__, level=logging.INFO)
 
 app = Flask(__name__)
-app.config["MAX_CONTENT_LENGTH"] = 500 * 1024 * 1024  # 500MB max file size
+app.config["MAX_CONTENT_LENGTH"] = 150 * 1024 * 1024  # 500MB max file size
 app.config["UPLOAD_FOLDER"] = "./data/uploads"
 app.config["ALLOWED_EXTENSIONS"] = {"mp4", "avi", "mov", "mkv", "webm"}
 
