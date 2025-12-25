@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VF-Digital - Video Fingerprinting System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Main Card -->
+        <div class="main-card">
+            <!-- Header -->
+            <div class="header">
+                <div class="logo-icon">
+                    <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+                        <path d="M30 5L50 15V45L30 55L10 45V15L30 5Z" stroke="url(#gradient)" stroke-width="2.5" fill="none"/>
+                        <circle cx="30" cy="30" r="8" fill="url(#gradient)"/>
+                        <defs>
+                            <linearGradient id="gradient" x1="0" y1="0" x2="60" y2="60">
+                                <stop offset="0%" stop-color="#00d9ff"/>
+                                <stop offset="100%" stop-color="#a855f7"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <h1 class="title">VIDEO IDENTIFY</h1>
+                <p class="subtitle">Video Recognition</p>
+                
+                <!-- Database Status -->
+                <div class="status-badge" id="statusBadge">
+                    <span class="status-dot"></span>
+                    <span id="videoCount">Loading...</span>
+                </div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="tab-nav">
+                <button class="tab-btn active" data-tab="upload">ADD VIDEO</button>
+                <button class="tab-btn" data-tab="search">FIND VIDEO</button>
+            </div>
+
+            <!-- Upload Tab (First) -->
+            <div class="tab-content active" id="uploadTab">
+                <form id="uploadForm">
+                    <div class="upload-area" id="uploadDropZone">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 8l-5-5-5 5M12 3v12" stroke-width="2"/>
+                        </svg>
+                        <p class="upload-title">Upload Video File</p>
+                        <p class="upload-hint">Drop & Drop or Click to Browse</p>
+                        <p class="upload-formats">(MP4, AVI, MOV, MKV, WebM)</p>
+                        <input type="file" id="videoFile" name="video" accept="video/*" required hidden>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" id="videoName" name="name" placeholder="Video Name (Optional)" class="text-input">
+                    </div>
+
+                    <button type="submit" class="action-btn secondary" id="uploadBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke-width="2"/>
+                        </svg>
+                        ADD TO DATABASE
+                    </button>
+                </form>
+
+                <!-- Upload Results -->
+                <div id="uploadResult" class="result-card" style="display: none;"></div>
+            </div>
+
+            <!-- Search Tab (Second) -->
+            <div class="tab-content" id="searchTab">
+                <form id="searchForm">
+                    <div class="upload-area" id="searchDropZone">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke-width="2"/>
+                        </svg>
+                        <p class="upload-title">Upload Query Video</p>
+                        <p class="upload-hint">Drop & Drop or Click to Browse</p>
+                        <p class="upload-formats">(MP4, AVI, MOV, MKV, WebM)</p>
+                        <input type="file" id="queryFile" name="query_video" accept="video/*" required hidden>
+                    </div>
+                    
+                    <div class="threshold-control">
+                        <label>Matching Threshold: <span id="thresholdValue">0.4</span></label>
+                        <input type="range" id="threshold" name="threshold" min="0.1" max="1.0" step="0.1" value="0.4">
+                    </div>
+
+                    <button type="submit" class="action-btn primary" id="searchBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="11" cy="11" r="8" stroke-width="2"/>
+                            <path d="M21 21l-4.35-4.35" stroke-width="2"/>
+                        </svg>
+                        SEARCH DATABASE
+                    </button>
+                </form>
+
+                <!-- Search Results -->
+                <div id="searchResult" class="result-card" style="display: none;"></div>
+            </div>
+
+            <!-- Processing Stages -->
+            <div id="stageTracker" class="stage-tracker" style="display: none;">
+                <div class="stage-title">PROCESSING STAGES</div>
+                <div class="stages-container">
+                    <div class="stage-item" data-stage="1">
+                        <div class="stage-number">1</div>
+                        <div class="stage-info">
+                            <div class="stage-name">File Validation</div>
+                            <div class="stage-status">Waiting...</div>
+                        </div>
+                        <div class="stage-indicator"></div>
+                    </div>
+                    <div class="stage-item" data-stage="2">
+                        <div class="stage-number">2</div>
+                        <div class="stage-info">
+                            <div class="stage-name">Video Preprocessing</div>
+                            <div class="stage-status">Waiting...</div>
+                        </div>
+                        <div class="stage-indicator"></div>
+                    </div>
+                    <div class="stage-item" data-stage="3">
+                        <div class="stage-number">3</div>
+                        <div class="stage-info">
+                            <div class="stage-name">Fingerprint Extraction</div>
+                            <div class="stage-status">Waiting...</div>
+                        </div>
+                        <div class="stage-indicator"></div>
+                    </div>
+                    <div class="stage-item" data-stage="4">
+                        <div class="stage-number">4</div>
+                        <div class="stage-info">
+                            <div class="stage-name">Database Operation</div>
+                            <div class="stage-status">Waiting...</div>
+                        </div>
+                        <div class="stage-indicator"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video List -->
+            <div class="video-list-section" id="videoListSection" style="display: none;">
+                <div class="section-title">DATABASE VIDEOS</div>
+                <div id="videoList" class="video-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

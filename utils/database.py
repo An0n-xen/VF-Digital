@@ -2,6 +2,7 @@ import os
 import json
 import uuid
 import time
+import logging
 import numpy as np
 from utils.video_utils import preprocess_video, extract_fingerprint
 from utils.logger_config import setup_logger
@@ -10,7 +11,7 @@ logger = setup_logger(__name__, level=logging.INFO)
 
 
 class VideoDatabase:
-    def __init__(self, db_folder="video_db"):
+    def __init__(self, db_folder="./data/video_db"):
         self.db_folder = db_folder
         self.fp_folder = os.path.join(db_folder, "fingerprints")
         self.meta_path = os.path.join(db_folder, "metadata.json")

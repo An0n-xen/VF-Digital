@@ -1,0 +1,5 @@
+flask
+werkzeug
+numpy
+opencv-python
+colorlog
